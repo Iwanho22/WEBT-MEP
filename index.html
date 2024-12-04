@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>The Crux</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta lang="de">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+
+<body>
+    <header class="w3-bar w3-grey">
+        <nav>
+            <a href="#information" class="w3-bar-item w3-button">The Crux</a>
+            <a href="#information" class="w3-bar-item w3-button">Information</a>
+            <a href="#input-area" class="w3-bar-item w3-button">Eingabebereich</a>
+            <a href="#" class="w3-bar-item w3-button">Ausgabebereich</a>
+        </nav>
+    </header>
+
+    <main id="content" class="w3-row w3-row-padding">
+        <article id="information" class="w3-col m6">
+            <h3>The Crux</h3>
+            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore
+                et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea
+                rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum
+                dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore
+                magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet
+                clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit
+                amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna
+                aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita
+                kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+                Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum
+                dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent
+                luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet,</p>
+        </article>
+        <article id="input-area" class="w3-col m6">
+            <h3>Eingabebereich</h3>
+            <div class="w3-row">
+                <section class="w3-col l6 ">
+                    <h4>Curx-Board</h4>
+                    <canvas id="crux-board" width="250" height="500"></canvas>
+                    <button class="w3-button w3-grey" v-on:click="generateRoute">Route generieren</button>
+                </section>
+                <section class="w3-col l6">
+                    <h4>Route erfassen</h4>
+                    <form class="w3-container" id="route-registration-form">
+                        <p>
+                            <label for="id-name">Name der Route</label>
+                            <input id="id-name" class="w3-input" name="routeName" type="text" v-model="routeName">
+                        </p>
+
+                        <p>
+                            <input id="id-climbed" class="w3-check" name="climbed" type="checkbox" v-model="climbed">
+                            <label for="id-climbed">Geklettert</label>
+                        </p>
+                        <p>
+                            <select id="id-grade" class="w3-select" name="grade" v-model="routeGrade">
+                                <option value="" disabled selected>Schwierigkeitsgrad</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6a">6a</option>
+                                <option value="6a+">6a+</option>
+                                <option value="6b">6b</option>
+                                <option value="6b+">6b+</option>
+                                <option value="6c">6c</option>
+                                <option value="6c+">6c+</option>
+                                <option value="7a">7a</option>
+                                <option value="7a+">7a+</option>
+                                <option value="7b">7b</option>
+                                <option value="7b+">7b+</option>
+                                <option value="7c">7c</option>
+                                <option value="7c+">7c+</option>
+                                <option value="8a">8a</option>
+                                <option value="8a+">8a+</option>
+                                <option value="8b">8b</option>
+                                <option value="8b+">8b+</option>
+                                <option value="8c">8c</option>
+                                <option value="8c+">8c+</option>
+                                <option value="9a">9a</option>
+                            </select>
+                        </p>
+                        <button class="w3-button w3-grey" v-on:click="logRoute">Erfassen</button>
+                    </form>
+                </section>
+            </div>
+        </article>
+        <article class="w3-col">
+            <table class="w3-table-all" v-cloak>
+                <thead>
+                    <tr class="w3-grey">
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Schwierigkeitsgrad</th>
+                        <th>Geklettert</th>
+                    </tr>
+                </thead>
+                <tr v-for="loggedRoute in loggedRoutes">
+                    <td>{{ loggedRoute.id }}</td>
+                    <td>{{ loggedRoute.name }}</td>
+                    <td>{{ loggedRoute.grade }}</td>
+                    <td>{{ loggedRoute.climbed }}</td>
+                </tr>
+            </table>
+        </article>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.2.31"></script>
+    <script src="./script/script.js"></script>
+</body>
+
+</html>

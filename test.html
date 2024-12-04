@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bouldering Moonboard</title>
+  <style>
+    canvas {
+      display: block;
+      margin: 20px auto;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="moonboard" width="800" height="1000"></canvas>
+
+  <script>
+    const canvas = document.getElementById('moonboard');
+    const ctx = canvas.getContext('2d');
+
+    // Board parameters
+    const rows = 6;
+    const cols = 6;
+    const cellWidth = canvas.width / cols;
+    const cellHeight = canvas.height / rows;
+
+    // Hold types
+    const holdTypes = ['circle', 'rectangle', 'line', 'double-line'];
+
+    function drawHold(type, x, y) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 1;
+
+      switch (type) {
+        case 'circle': // Sloper
+          ctx.beginPath();
+          ctx.arc(0, 0, 10, 0, Math.PI * 2);
+          ctx.stroke();
+          break;
+
+        case 'rectangle': // Jug
+          ctx.strokeRect(-15, -8, 30, 16);
+          break;
+
+        case 'line': // Crimp
+          ctx.beginPath();
+          ctx.moveTo(-15, 0);
+          ctx.lineTo(15, 0);
+          ctx.stroke();
+          break;
+
+        case 'double-line': // Pinch
+          ctx.beginPath();
+          ctx.moveTo(-12, -4);
+          ctx.lineTo(12, -4);
+          ctx.moveTo(-12, 4);
+          ctx.lineTo(12, 4);
+          ctx.stroke();
+          break;
+      }
+
+      ctx.restore();
+    }
+
+    function drawGrid() {
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const x = col * cellWidth + cellWidth / 2;
+          const y = row * cellHeight + cellHeight / 2;
+          const type = holdTypes[Math.floor(Math.random() * holdTypes.length)];
+          drawHold(type, x, y);
+        }
+      }
+    }
+
+    drawGrid();
+  </script>
+</body>
+</html>
