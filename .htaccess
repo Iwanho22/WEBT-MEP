@@ -1,0 +1,6 @@
+DirectoryIndex frontend.html
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ backend.php?method=$1 [QSA,L]

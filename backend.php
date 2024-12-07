@@ -3,7 +3,7 @@ $conn = mysqli_connect("localhost", "root", "", "thecrux");
 
 header('Content-Type: application/json');
 
-if ($mysqli->connect_error) {
+if ($conn->connect_error) {
     die("Connection failed: " . $mysqli->connect_error);
 }
 
@@ -22,16 +22,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo($climb->name);
     }
 } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-
     if (isset($_GET['method']) && $_GET['method'] == 'climb') {
-        $results;
-        $result = $conn->query("SELECT id, name, grade, climbed from climb");
-        $rows = [];
-        while ($row = $result->fetch_object()) {
-            $rows[] = $row;
-        }
+        if (isset($_GET['id'])) {
+           
+            $stmt = $conn->prepare("SELECT id, name, grade, climbed, route from climb where id=?");
+            $stmt->bind_param('i', $_GET['id']);
+            if($stmt->execute()) {
+                $result = $stmt->get_result()->fetch_object();
+                $result->route = json_decode($result->route);
+                echo(json_encode($result));
+            };
+        } else {
+            $result = $conn->query("SELECT id, name, grade, climbed from climb");
+            $rows = [];
+            while ($row = $result->fetch_object()) {
+                $rows[] = $row;
+            }
 
-        echo(json_encode($rows));
+            echo(json_encode($rows));
+        }   
     }
 }
 

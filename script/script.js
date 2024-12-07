@@ -16,7 +16,6 @@ Vue.createApp({
             const ctx = canvas.getContext('2d');
             const cellWidth = canvas.width / this.cols;
             const cellHeight = canvas.height / this.rows;
-
             const holdTypes = [['circle', 'triangle', 'double-line', 'circle'],
             ['rectangle', 'line', 'rectangle', 'circle'],
             ['line', 'triangle', 'line', 'double-line'],
@@ -118,6 +117,19 @@ Vue.createApp({
                 console.log(this.loggedRoutes);
             }
             xhr.open("GET", "climb", true);
+            xhr.send();
+        }, 
+        editRoute(id) {
+            const xhr = new XMLHttpRequest();
+            xhr.onload =  () => {
+                let route = JSON.parse(xhr.response);
+                this.routeName = route.name;
+                this.routeGrade = route.grade;
+                this.climbed = route.climbed;
+                this.markedHolds = route.route;
+                this.drawCruxBoard();
+            }
+            xhr.open("GET", `climb?id=${id}`, true);
             xhr.send();
         }
     },

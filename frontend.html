@@ -97,6 +97,7 @@
                         <th>Name</th>
                         <th>Schwierigkeitsgrad</th>
                         <th>Geklettert</th>
+                        <th>Aktionen</th>
                     </tr>
                 </thead>
                 <tr v-for="loggedRoute in loggedRoutes">
@@ -104,6 +105,10 @@
                     <td>{{ loggedRoute.name }}</td>
                     <td>{{ loggedRoute.grade }}</td>
                     <td>{{ loggedRoute.climbed }}</td>
+                    <td>
+                        <img alt="edit climb" src="./img/edit_icon.svg" v-on:click="editRoute(loggedRoute.id)"/>
+                        <img alt="delete climb" src="./img/delete_icon.svg" v-on:click="delete(loggedRoute.id)"/>
+                    </td>
                 </tr>
             </table>
         </article>
