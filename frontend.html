@@ -48,10 +48,10 @@
                 </section>
                 <section class="w3-col l6">
                     <h4>Route erfassen</h4>
-                    <form class="w3-container" id="route-registration-form">
+                    <form class="w3-container" id="route-registration-form" @submit.prevent="logRoute">
                         <p>
                             <label for="id-name">Name der Route</label>
-                            <input id="id-name" class="w3-input" name="routeName" type="text" v-model="routeName">
+                            <input id="id-name" class="w3-input" name="routeName" type="text" v-model="routeName" required>
                         </p>
 
                         <p>
@@ -59,7 +59,7 @@
                             <label for="id-climbed">Geklettert</label>
                         </p>
                         <p>
-                            <select id="id-grade" class="w3-select" name="grade" v-model="routeGrade">
+                            <select id="id-grade" class="w3-select" name="grade" v-model="routeGrade" required>
                                 <option value="" disabled selected>Schwierigkeitsgrad</option>
                                 <option value="4">4</option>
                                 <option value="5">5</option>
@@ -84,7 +84,8 @@
                                 <option value="9a">9a</option>
                             </select>
                         </p>
-                        <button class="w3-button w3-grey" v-on:click="logRoute">Erfassen</button>
+                        <button :disabled='markedHolds.length == 0' class="w3-button w3-grey">Erfassen</button>
+                        <!-- <input class="w3-button w3-grey" v-on:click="logRoute" type="submit">Erfassen</input> -->
                     </form>
                 </section>
             </div>
@@ -107,7 +108,7 @@
                     <td>{{ loggedRoute.climbed }}</td>
                     <td>
                         <img alt="edit climb" src="./img/edit_icon.svg" v-on:click="editRoute(loggedRoute.id)"/>
-                        <img alt="delete climb" src="./img/delete_icon.svg" v-on:click="delete(loggedRoute.id)"/>
+                        <img alt="delete climb" src="./img/delete_icon.svg" v-on:click="deleteRoute(loggedRoute.id)"/>
                     </td>
                 </tr>
             </table>

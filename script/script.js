@@ -3,6 +3,7 @@ Vue.createApp({
         return {
             rows: 6,
             cols: 4,
+            id: 0,
             markedHolds: [],
             routeName: '',
             routeGrade: '',
@@ -94,43 +95,52 @@ Vue.createApp({
         },
         logRoute(e) {
             e.preventDefault();
-            console.log(e);
-
             const climb = {
+                id: this.id,
                 name: this.routeName,
                 grade: this.routeGrade,
-                climbed: this.climbed,
+                climbed: this.climbed || false,
                 route: this.markedHolds
             }
 
-            const xhr = new XMLHttpRequest();
-            xhr.onload = function () {
-                console.log("loaded")
-            }
-            xhr.open("POST", "climb", true);
-            xhr.send(JSON.stringify(climb));
+            this.sendRequest(this.id != 0 ? 'PATCH' : 'POST', 'climb' + (this.id != 0 ? `?id=${this.id}` : ''), () => {
+                this.getRoutes();
+            }, JSON.stringify(climb));
+            this.id = 0;
+            this.routeName = null;
+            this.routeGrade = '';
+            this.climbed = false;
+            this.markedHolds = [];
+            this.drawCruxBoard();
         },
         getRoutes() {
-            const xhr = new XMLHttpRequest();
-            xhr.onload =  () => {
-                this.loggedRoutes = JSON.parse(xhr.response);
-                console.log(this.loggedRoutes);
-            }
-            xhr.open("GET", "climb", true);
-            xhr.send();
+            const self = this;
+            this.sendRequest('GET', 'climb', function() {
+                self.loggedRoutes = JSON.parse(this.response);
+            })
         }, 
         editRoute(id) {
+            const self = this;
+            this.sendRequest('GET', `climb?id=${id}`, function() {
+                let route = JSON.parse(this.response);
+                self.routeName = route.name;
+                self.routeGrade = route.grade;
+                self.climbed = route.climbed;
+                self.markedHolds = route.route;
+                self.id = route.id;
+                self.drawCruxBoard();
+            });
+        },
+        deleteRoute(id) {
+            this.sendRequest('DELETE', `climb?id=${id}`, () => {
+                this.getRoutes();
+            })
+        },
+        sendRequest(method, url, callback, body =  null) {
             const xhr = new XMLHttpRequest();
-            xhr.onload =  () => {
-                let route = JSON.parse(xhr.response);
-                this.routeName = route.name;
-                this.routeGrade = route.grade;
-                this.climbed = route.climbed;
-                this.markedHolds = route.route;
-                this.drawCruxBoard();
-            }
-            xhr.open("GET", `climb?id=${id}`, true);
-            xhr.send();
+            xhr.onload = callback;
+            xhr.open(method, url, true);
+            xhr.send(body);
         }
     },
     mounted: function () {
