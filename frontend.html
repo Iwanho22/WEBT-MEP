@@ -12,7 +12,7 @@
 </head>
 
 <body>
-    <header class="w3-bar w3-grey">
+    <header class="w3-bar w3-indigo nav-bar">
         <nav>
             <a href="#information" class="w3-bar-item w3-button">The Crux</a>
             <a href="#information" class="w3-bar-item w3-button">Information</a>
@@ -22,7 +22,7 @@
     </header>
 
     <main id="content" class="w3-row w3-row-padding">
-        <article id="information" class="w3-col m6">
+        <article id="information" class="w3-col l6">
             <h3>The Crux</h3>
             <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore
                 et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea
@@ -38,62 +38,79 @@
                 dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent
                 luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet,</p>
         </article>
-        <article id="input-area" class="w3-col m6">
+        <article id="input-area" class="w3-col l6">
             <h3>Eingabebereich</h3>
             <div class="w3-row">
-                <section class="w3-col l6 ">
+                <section class="w3-col m6 ">
                     <h4>Curx-Board</h4>
                     <canvas id="crux-board" width="250" height="500"></canvas>
-                    <button class="w3-button w3-grey" v-on:click="generateRoute">Route generieren</button>
+                    <button class="w3-button w3-indigo" v-on:click="generateRoute" :disabled='id != 0'>Route
+                        generieren</button>
                 </section>
-                <section class="w3-col l6">
+                <section class="w3-col m6">
                     <h4>Route erfassen</h4>
-                    <form class="w3-container" id="route-registration-form" @submit.prevent="logRoute">
+                    <form class="w3-container" id="route-registration-form" @submit.prevent="logRoute" novalidate>
                         <p>
                             <label for="id-name">Name der Route</label>
-                            <input id="id-name" class="w3-input" name="routeName" type="text" v-model="routeName" required>
+                            <input id="id-name" class="w3-input" name="routeName" type="text" v-model="routeName"
+                                required @input="validateRouteName()">
+                        <p v-if="errorMsg['routeName']" class="w3-panel w3-pale-red w3-border">
+                            {{errorMsg['routeName']}}
+                        </p>
                         </p>
 
                         <p>
-                            <input id="id-climbed" class="w3-check" name="climbed" type="checkbox" v-model="climbed">
+                            <input id="id-climbed" class="w3-check" name="climbed" type="checkbox" v-model="climbed"
+                                :checked="climbed">
                             <label for="id-climbed">Geklettert</label>
                         </p>
                         <p>
-                            <select id="id-grade" class="w3-select" name="grade" v-model="routeGrade" required>
+                            <select id="id-grade" class="w3-select" name="grade" v-model="routeGrade" required
+                                @change="validateGrade()">
                                 <option value="" disabled selected>Schwierigkeitsgrad</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6a">6a</option>
-                                <option value="6a+">6a+</option>
-                                <option value="6b">6b</option>
-                                <option value="6b+">6b+</option>
-                                <option value="6c">6c</option>
-                                <option value="6c+">6c+</option>
-                                <option value="7a">7a</option>
-                                <option value="7a+">7a+</option>
-                                <option value="7b">7b</option>
-                                <option value="7b+">7b+</option>
-                                <option value="7c">7c</option>
-                                <option value="7c+">7c+</option>
-                                <option value="8a">8a</option>
-                                <option value="8a+">8a+</option>
-                                <option value="8b">8b</option>
-                                <option value="8b+">8b+</option>
-                                <option value="8c">8c</option>
-                                <option value="8c+">8c+</option>
-                                <option value="9a">9a</option>
+                                <option value="4">{{scale == 'fb_bloc' ? 4 : 'V0'}}</option>
+                                <option value="5">{{scale == 'fb_bloc' ? 5 : 'V1'}}</option>
+                                <option value="5+">{{scale == 'fb_bloc' ? '5+' : 'V2'}}</option>
+                                <option value="6a">{{scale == 'fb_bloc' ? '6a' : 'V3'}}</option>
+                                <option value="6a+">{{scale == 'fb_bloc' ? '6a+' : 'V4'}}</option>
+                                <option v-if="scale == 'fb_bloc'" value="6b">6b</option>
+                                <option v-if="scale == 'fb_bloc'" value="6b+">6b+</option>
+                                <option value="6c">{{scale == 'fb_bloc' ? '6c' : 'V5'}}</option>
+                                <option v-if="scale == 'fb_bloc'" value="6c+">6c+</option>
+                                <option value="7a">{{scale == 'fb_bloc' ? '7a' : 'V6'}}</option>
+                                <option value="7a+">{{scale == 'fb_bloc' ? '7a+' : 'V7'}}</option>
+                                <option value="7b">{{scale == 'fb_bloc' ? '7b' : 'V8'}}</option>
+                                <option v-if="scale == 'fb_bloc'" value="7b+">7b+</option>
+                                <option value="7c">{{scale == 'fb_bloc' ? '7c' : 'V9'}}</option>
+                                <option value="7c+">{{scale == 'fb_bloc' ? '7c+' : 'V10'}}</option>
+                                <option value="8a">{{scale == 'fb_bloc' ? '8a' : 'V11'}}</option>
+                                <option value="8a+">{{scale == 'fb_bloc' ? '8a+' : 'V12'}}</option>
+                                <option value="8b">{{scale == 'fb_bloc' ? '8b' : 'V13'}}</option>
+                                <option value="8b+">{{scale == 'fb_bloc' ? '8b+' : 'V14'}}</option>
+                                <option value="8c">{{scale == 'fb_bloc' ? '8c' : 'V15'}}</option>
+                                <option value="8c+">{{scale == 'fb_bloc' ? '8c+' : 'V16'}}</option>
+                                <option value="9a">{{scale == 'fb_bloc' ? '9a' : 'V17'}}</option>
                             </select>
+                        <p v-if="errorMsg['grade']" class="w3-panel w3-pale-red w3-border">
+                            {{errorMsg['grade']}}
                         </p>
-                        <button :disabled='markedHolds.length == 0' class="w3-button w3-grey">Erfassen</button>
-                        <!-- <input class="w3-button w3-grey" v-on:click="logRoute" type="submit">Erfassen</input> -->
+                        </p>
+                        <button :disabled='markedHolds.length == 0' class="w3-button w3-indigo">Speichern</button>
                     </form>
                 </section>
             </div>
         </article>
         <article class="w3-col">
+            <div>
+                <input class="w3-radio" type="radio" name="scale" value="fb_bloc" :checked="scale == 'fb_bloc'" v-model="scale"
+                    @change="scaleChanged">
+                <label>FB bloc</label>
+                <input class="w3-radio" type="radio" name="scale" value="v" v-model="scale" :checked="scale != 'fb_bloc'" @change="scaleChanged">
+                <label>V</label>
+            </div>
             <table class="w3-table-all" v-cloak>
                 <thead>
-                    <tr class="w3-grey">
+                    <tr class="w3-indigo">
                         <th>Id</th>
                         <th>Name</th>
                         <th>Schwierigkeitsgrad</th>
@@ -105,10 +122,10 @@
                     <td>{{ loggedRoute.id }}</td>
                     <td>{{ loggedRoute.name }}</td>
                     <td>{{ loggedRoute.grade }}</td>
-                    <td>{{ loggedRoute.climbed }}</td>
+                    <td>{{ loggedRoute.climbed == true? 'Ja' : 'Nein' }}</td>
                     <td>
-                        <img alt="edit climb" src="./img/edit_icon.svg" v-on:click="editRoute(loggedRoute.id)"/>
-                        <img alt="delete climb" src="./img/delete_icon.svg" v-on:click="deleteRoute(loggedRoute.id)"/>
+                        <img alt="edit climb" src="./img/edit_icon.svg" v-on:click="editRoute(loggedRoute.id)" />
+                        <img alt="delete climb" src="./img/delete_icon.svg" v-on:click="deleteRoute(loggedRoute.id)" />
                     </td>
                 </tr>
             </table>

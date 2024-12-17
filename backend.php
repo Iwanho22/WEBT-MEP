@@ -4,15 +4,12 @@ header('Content-Type: application/json');
 
 const FB_BLOC = 'fb_bloc';
 const V = 'v';
-$selectedSkala;
+$selectedScale;
 
-if(!isset($_COOKIE['skala'])) {
-    setcookie('skala', FB_BLOC);
-    $selectedSkala = FB_BLOC;
-} else {
-    $selectedSkala = $_COOKIE['skala'];
-}
-define('SELECTED_SKALA',$selectedSkala);
+if(!isset($_COOKIE['scale'])) {
+    setcookie('scale', FB_BLOC);
+    $_COOKIE['scale'] = FB_BLOC;
+} 
 
 const FB_TO_V = [
     "4"=> "V0",
@@ -91,7 +88,7 @@ $conn->close();
 
 
 function convert_grade($climb) {
-    if (SELECTED_SKALA === V) {
+    if ($_COOKIE['scale'] === V) {
         $climb->grade = FB_TO_V[$climb->grade];
     }
 }

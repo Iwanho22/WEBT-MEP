@@ -8,7 +8,9 @@ Vue.createApp({
             routeName: '',
             routeGrade: '',
             climbed: false,
-            loggedRoutes: []
+            loggedRoutes: [],
+            errorMsg: [],
+            scale: 'fb_bloc'
         }
     },
     methods: {
@@ -17,8 +19,7 @@ Vue.createApp({
             const ctx = canvas.getContext('2d');
             const cellWidth = canvas.width / this.cols;
             const cellHeight = canvas.height / this.rows;
-            const holdTypes = [['circle', 'triangle', 'double-line', 'circle'],
-            ['rectangle', 'line', 'rectangle', 'circle'],
+            const holdTypes = [['circle', 'triangle', 'double-line', 'circle'], ['rectangle', 'line', 'rectangle', 'circle'],
             ['line', 'triangle', 'line', 'double-line'],
             ['triangle', 'rectangle', 'rectangle', 'circle'],
             ['circle', 'line', 'line', 'circle'],
@@ -75,11 +76,10 @@ Vue.createApp({
             ctx.restore();
         },
         generateRoute() {
-            this.markedHolds = Array.from({ length: this.rows}, () => 
-                Array.from({ length: this.cols}, () => false)
+            this.markedHolds = Array.from({ length: this.rows }, () =>
+                Array.from({ length: this.cols }, () => false)
             );
-            for (let row = 0; row < this.rows; row++){
-                // one or tow holds
+            for (let row = 0; row < this.rows; row++) {
                 const twoHolds = Math.floor(Math.random() * 11) > 7;
                 this.markedHolds[row][Math.floor(Math.random() * this.cols)] = true;
 
@@ -95,40 +95,35 @@ Vue.createApp({
         },
         logRoute(e) {
             e.preventDefault();
-            const climb = {
-                id: this.id,
-                name: this.routeName,
-                grade: this.routeGrade,
-                climbed: this.climbed || false,
-                route: this.markedHolds
-            }
+            this.validateGrade();
+            this.validateRouteName();
+            if (Object.keys(this.errorMsg).length === 0) {
+                const climb = {
+                    id: this.id,
+                    name: this.routeName,
+                    grade: this.routeGrade,
+                    climbed: this.climbed || false,
+                    route: this.markedHolds
+                }
 
-            this.sendRequest(this.id != 0 ? 'PATCH' : 'POST', 'climb' + (this.id != 0 ? `?id=${this.id}` : ''), () => {
-                this.getRoutes();
-            }, JSON.stringify(climb));
-            this.id = 0;
-            this.routeName = null;
-            this.routeGrade = '';
-            this.climbed = false;
-            this.markedHolds = [];
-            this.drawCruxBoard();
+                this.sendRequest(this.id != 0 ? 'PATCH' : 'POST', 'climb' + (this.id != 0 ? `?id=${this.id}` : ''), () => {
+                    this.getRoutes();
+                }, JSON.stringify(climb));
+                this.fillClimb(null);
+            }
         },
         getRoutes() {
             const self = this;
-            this.sendRequest('GET', 'climb', function() {
+            this.sendRequest('GET', 'climb', function () {
                 self.loggedRoutes = JSON.parse(this.response);
             })
-        }, 
+        },
         editRoute(id) {
             const self = this;
-            this.sendRequest('GET', `climb?id=${id}`, function() {
+            this.sendRequest('GET', `climb?id=${id}`, function () {
                 let route = JSON.parse(this.response);
-                self.routeName = route.name;
-                self.routeGrade = route.grade;
-                self.climbed = route.climbed;
-                self.markedHolds = route.route;
-                self.id = route.id;
-                self.drawCruxBoard();
+                self.errorMsg = [];
+                self.fillClimb(route);
             });
         },
         deleteRoute(id) {
@@ -136,15 +131,43 @@ Vue.createApp({
                 this.getRoutes();
             })
         },
-        sendRequest(method, url, callback, body =  null) {
+        sendRequest(method, url, callback, body = null) {
             const xhr = new XMLHttpRequest();
             xhr.onload = callback;
             xhr.open(method, url, true);
             xhr.send(body);
+        },
+        fillClimb(climb) {
+            this.routeName = climb?.name || '';
+            this.routeGrade = climb?.grade || '';
+            this.climbed = climb?.climbed || false;
+            this.markedHolds = climb?.route || [];
+            this.id = climb?.id || 0;
+            this.drawCruxBoard();
+        },
+        validateRouteName() {
+            if (this.routeName.length < 5) {
+                this.errorMsg['routeName'] = "Der Routenname muss mindestens 5 Zeichen lang sein.";
+            } else {
+                delete this.errorMsg['routeName'];
+            }
+        },
+        validateGrade() {
+            // todo fix
+            if (this.routeGrade.length < 1) {
+                this.errorMsg['grade'] = "Wählen sie einen gültigen schwierigkeitsgrad aus der Liste aus.";
+            } else {
+                delete this.errorMsg['grade'];
+            }
+        },
+        scaleChanged() {
+            document.cookie = `scale=${this.scale}`; 
+            this.getRoutes();
         }
     },
     mounted: function () {
         this.drawCruxBoard();
         this.getRoutes();
+        this.scale = document.cookie.split("; ").find((row) => row.startsWith("scale="))?.split("=")[1] || 'fb_bloc';
     }
 }).mount('#content')
