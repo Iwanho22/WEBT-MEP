@@ -1,9 +1,10 @@
 <?php
 $conn = mysqli_connect("localhost", "root", "", "thecrux");
 header('Content-Type: application/json');
-
 const FB_BLOC = 'fb_bloc';
 const V = 'v';
+const ROUTE_ROWS = 6;
+const ROUTE_COLS = 4;
 $selectedScale;
 
 if(!isset($_COOKIE['scale'])) {
@@ -37,49 +38,69 @@ const FB_TO_V = [
 ];
 
 if ($conn->connect_error) {
-    die("Connection failed: " . $mysqli->connect_error);
+    return_error(500, "Error while connection to Database");
 }
 
 
 if (isset($_GET['method']) && $_GET['method'] == 'climb') {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $climb = convertClimbToDBModel(file_get_contents("php://input"));
-        
+        $climb = decode_json(file_get_contents("php://input"));
+        validate_climb($climb);
+
+        $climb = convert_climb_to_dbmodel($climb);
+
         $stmt = $conn->prepare("INSERT INTO climb (name, grade, climbed, route) values (?, ?, ?, ?)");
         $stmt->bind_param("ssis", $climb->name, $climb->grade, $climb->climbed, $climb->route);
         
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            return_error(500, "Error while saving climb.");
+        }
+
     } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if (isset($_GET['id'])) {
             $stmt = $conn->prepare("SELECT id, name, grade, climbed, route from climb where id=?");
             $stmt->bind_param('i', $_GET['id']);
-            if($stmt->execute()) {
-                $result = $stmt->get_result()->fetch_object();
+            
+            $error = $stmt->execute();
+            $result = $stmt->get_result()->fetch_object();
+            if($error && $result != null) {
                 $result->route = json_decode($result->route);
                 echo(json_encode($result));
+            } else {
+                return_error(500, "Error while loading climb with id=" . $_GET['id']);
             };
         } else {
             $result = $conn->query("SELECT id, name, grade, climbed from climb");
-            $rows = [];
-            while ($row = $result->fetch_object()) {
-                convert_grade($row);
-                $rows[] = $row;
-            }
+            if (is_bool($result) && !$result) {
+                return_error(500, "Error while loading climbs.");
+            } else {
+                $rows = [];
+                while ($row = $result->fetch_object()) {
+                    convert_grade($row);
+                    $rows[] = $row;
+                }
 
-            echo(json_encode($rows));
+                echo(json_encode($rows));
+            }
         }
     } else if($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         if (isset($_GET['id'])) {
             $stmt = $conn->prepare("DELETE FROM climb WHERE id=?");
             $stmt->bind_param('i', $_GET['id']);
-            $stmt->execute();
+            if(!$stmt->execute()) {
+                return_error(500, "Error while deleting climg with id=" . $id);
+            }
         }
     } else if($_SERVER['REQUEST_METHOD'] === 'PATCH') {
         if (isset($_GET['id'])) {
-            $climb = convertClimbToDBModel(file_get_contents("php://input"));
+            $climb = decode_json(file_get_contents("php://input"));
+            validate_climb($climb);
+            $climb = convert_climb_to_dbmodel($climb);
             $stmt = $conn->prepare("UPDATE climb SET name = ?, climbed = ?, grade = ? WHERE id = ?");
             $stmt->bind_param('sisi', $climb->name, $climb->climbed, $climb->grade, $climb->id);
-            $stmt->execute();
+            if(!$stmt->execute()) {
+                return_error(500, "Error while updating climg with id=" . $id);
+            }
         }
     }
 }
@@ -93,11 +114,47 @@ function convert_grade($climb) {
     }
 }
 
-function convertClimbToDBModel($json) {
-    $climb = json_decode($json);
+function convert_climb_to_dbmodel($climb) {
     $climb->climbed = $climb->climbed === true; // TODO fix this
     $climb->route = json_encode($climb->route);
 
     return $climb;
+}
+
+function validate_climb($climb) {
+    if (is_string($climb->name) && strlen($climb->name) < 5) {
+        return_error(400, "Invalid name, name must be at least 5 characters.");
+    } else if (is_string($climb->grade) && !array_key_exists($climb->grade, FB_TO_V)) {
+        return_error(400, "Invalid route grade");
+    }
+
+    $route_valid = false;
+    if (is_array($climb->route) && count($climb->route) == ROUTE_ROWS) {
+        foreach ($climb->route as $row) {
+            $route_valid = is_array($row) 
+                && count($row) === count(array_filter($row, 'is_bool'))
+                && count($row) == ROUTE_COLS;
+        }
+        unset($row);
+    }
+
+    if (!$route_valid){
+         return_error(400, "Invalid route");
+    }
+}
+
+function return_error($code, $message) {
+    http_response_code($code);
+    echo json_encode(['error' => ['reponseCode' => $code, 'message'=> $message]]);
+    die();
+}
+
+function decode_json($json) {
+    $decoded = json_decode($json);
+    if ($decoded == null) {
+        return_error(400, "Invalid Json.");
+    }
+
+    return $decoded;
 }
 ?>

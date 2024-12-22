@@ -10,7 +10,8 @@ Vue.createApp({
             climbed: false,
             loggedRoutes: [],
             errorMsg: [],
-            scale: 'fb_bloc'
+            scale: 'fb_bloc',
+            generalErrorMsg: ''
         }
     },
     methods: {
@@ -100,7 +101,7 @@ Vue.createApp({
             if (Object.keys(this.errorMsg).length === 0) {
                 const climb = {
                     id: this.id,
-                    name: this.routeName,
+                    name: "a",
                     grade: this.routeGrade,
                     climbed: this.climbed || false,
                     route: this.markedHolds
@@ -113,17 +114,15 @@ Vue.createApp({
             }
         },
         getRoutes() {
-            const self = this;
-            this.sendRequest('GET', 'climb', function () {
-                self.loggedRoutes = JSON.parse(this.response);
+            this.sendRequest('GET', 'climb', (response) => {
+                this.loggedRoutes = JSON.parse(response);
             })
         },
         editRoute(id) {
-            const self = this;
-            this.sendRequest('GET', `climb?id=${id}`, function () {
-                let route = JSON.parse(this.response);
-                self.errorMsg = [];
-                self.fillClimb(route);
+            this.sendRequest('GET', `climb?id=${id}`, (response) => {
+                let route = JSON.parse(response);
+                this.errorMsg = [];
+                this.fillClimb(route);
             });
         },
         deleteRoute(id) {
@@ -133,9 +132,23 @@ Vue.createApp({
         },
         sendRequest(method, url, callback, body = null) {
             const xhr = new XMLHttpRequest();
-            xhr.onload = callback;
+            const self = this;
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    callback(xhr.response);
+                } else {
+                    console.log(JSON.parse(xhr.response))
+                    self.generalErrorMsg = JSON.parse(xhr.response).error?.message ?? "Es ist ein allgemeiner Fehler aufgetreten";
+                }
+            };
             xhr.open(method, url, true);
             xhr.send(body);
+            xhr.onerror = () => {
+                this.generalErrorMsg = "Es ist ein allgeimeiner Fehler aufgetreten bitte versuchen sie es erneut.";
+            }
+            xhr.ontimeout = () => {
+                this.generalErrorMsg = "Es ist ein allgeimeiner Fehler aufgetreten bitte versuchen sie es erneut.";
+            }
         },
         fillClimb(climb) {
             this.routeName = climb?.name || '';
@@ -161,7 +174,7 @@ Vue.createApp({
             }
         },
         scaleChanged() {
-            document.cookie = `scale=${this.scale}`; 
+            document.cookie = `scale=${this.scale}`;
             this.getRoutes();
         }
     },

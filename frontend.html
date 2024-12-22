@@ -3,6 +3,7 @@
 
 <head>
     <title>The Crux</title>
+    <link rel="icon" type="image/x-icon" href="./img/icon.png">
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,30 +14,64 @@
 
 <body>
     <header class="w3-bar w3-indigo nav-bar">
-        <nav>
-            <a href="#information" class="w3-bar-item w3-button">The Crux</a>
-            <a href="#information" class="w3-bar-item w3-button">Information</a>
-            <a href="#input-area" class="w3-bar-item w3-button">Eingabebereich</a>
-            <a href="#" class="w3-bar-item w3-button">Ausgabebereich</a>
+        <nav class="nav">
+            <a href="#information" class="w3-bar-item w3-button"><img class="header-icon" src="./img/icon.png"
+                    alt="icon"></a>
+            <a href="#information" class="w3-bar-item w3-button w3-xlarge">Information</a>
+            <a href="#input-area" class="w3-bar-item w3-button w3-xlarge">Eingabebereich</a>
+            <a href="#output-area" class="w3-bar-item w3-button w3-xlarge">Ausgabebereich</a>
         </nav>
     </header>
 
-    <main id="content" class="w3-row w3-row-padding">
+    <main id="content" class="w3-row w3-row-padding" v-cloak>
+        <div class="error-msg  w3-pale-red w3-leftbar w3-border-red" v-if="generalErrorMsg" v-cloak>
+            <p>{{generalErrorMsg}}</p>
+            <button class="action-btn" v-on:click="generalErrorMsg = ''"><img class="error-msg-icon"
+                    src="./img/close_icon.svg"></button>
+        </div>
         <article id="information" class="w3-col l6">
             <h3>The Crux</h3>
-            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore
-                et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea
-                rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum
-                dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore
-                magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet
-                clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit
-                amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna
-                aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita
-                kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+            <p>Die Webseite „The Crux“ dient als interaktive Plattform zur Erstellung, Verwaltung und Dokumentation von
+                Boulder-Routen, ähnlich einem MoonBoard-System. Benutzer können mithilfe eines visuellen „Curx-Boards“
+                individuelle Routen generieren lassen. Dabei repräsentieren verschiedene Symbole unterschiedliche
+                Griffarten: Kreise stehen für Sloper, Rechtecke für Jugs, Linien für Crimps, doppelte Linien für Pinches
+                und Dreiecke für Pockets. Die ausgewählten Griffe werden bei der Erstellung visuell hervorgehoben, um
+                die Route klar erkennbar zu machen.
+            </p>
 
-                Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum
-                dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent
-                luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet,</p>
+            <p>
+                Nach der Generierung kann der Benutzer der Route einen Namen geben, den Schwierigkeitsgrad aus einem
+                Dropdown-Menü auswählen und angeben, ob er die Route bereits geklettert hat. Diese Informationen werden
+                anschließend in einer übersichtlichen Tabelle gespeichert. Die Tabelle zeigt alle erstellten Routen an
+                und
+                ermöglicht es dem Benutzer, Routen nachträglich zu bearbeiten (Name, Schwierigkeitsgrad,
+                Geklettert-Status)
+                oder zu löschen.
+            </p>
+            <p>
+                Zusätzlich bietet die Plattform die Möglichkeit, zwischen verschiedenen Bewertungsskalen zu wechseln,
+                beispielsweise von der Fontainebleau-Skala (FB_bloc) zur US-amerikanischen V-Grade-Skala. Diese
+                Flexibilität
+                erlaubt es Kletterern aus unterschiedlichen Regionen, ihre Routen entsprechend vertrauten Standards zu
+                bewerten.
+            </p>
+            <div class="hold-type-legend-container w3-col l3">
+                <div class="hold-type-legend">
+                    <img src="./img/Jug.png"><span class="hold-type-desc">Jug</span>
+                </div>
+                <div class="hold-type-legend">
+                    <img class="hold-type-img" src="./img/crimp.png"><span class="hold-type-desc">Crimp</span>
+                </div>
+                <div class="hold-type-legend">
+                    <img class="hold-type-img" src="./img/pinch.png"><span class="hold-type-desc">Pinch</span>
+                </div>
+                <div class="hold-type-legend">
+                    <img class="hold-type-img" src="./img/pocket.png"><span class="hold-type-desc">Pocket</span>
+                </div>
+                <div class="hold-type-legend">
+                    <img class="hold-type-img" src="./img/sloper.png"><span class="hold-type-desc">Sloper</span>
+                </div>
+            </div>
         </article>
         <article id="input-area" class="w3-col l6">
             <h3>Eingabebereich</h3>
@@ -54,7 +89,7 @@
                             <label for="id-name">Name der Route</label>
                             <input id="id-name" class="w3-input" name="routeName" type="text" v-model="routeName"
                                 required @input="validateRouteName()">
-                        <p v-if="errorMsg['routeName']" class="w3-panel w3-pale-red w3-border">
+                        <p v-if="errorMsg['routeName']" class="w3-panel w3-pale-red w3-border w3-border-red">
                             {{errorMsg['routeName']}}
                         </p>
                         </p>
@@ -91,7 +126,7 @@
                                 <option value="8c+">{{scale == 'fb_bloc' ? '8c+' : 'V16'}}</option>
                                 <option value="9a">{{scale == 'fb_bloc' ? '9a' : 'V17'}}</option>
                             </select>
-                        <p v-if="errorMsg['grade']" class="w3-panel w3-pale-red w3-border">
+                        <p v-if="errorMsg['grade']" class="w3-panel w3-pale-red w3-border w3-border-red">
                             {{errorMsg['grade']}}
                         </p>
                         </p>
@@ -100,13 +135,17 @@
                 </section>
             </div>
         </article>
-        <article class="w3-col">
-            <div>
-                <input class="w3-radio" type="radio" name="scale" value="fb_bloc" :checked="scale == 'fb_bloc'" v-model="scale"
+        <article id="output-area" class="w3-col">
+            <div class="toggle-container">
+                <input type="radio" id="toggle-fb_bloc" name="scale" value="fb_bloc" :checked="scale == 'fb_bloc'"
+                    v-model="scale" @change="scaleChanged">
+                <label for="toggle-fb_bloc" class="toggle-label">FB bloc</label>
+
+                <input type="radio" id="toggle-v" name="scale" value="v" v-model="scale" :checked="scale != 'fb_bloc'"
                     @change="scaleChanged">
-                <label>FB bloc</label>
-                <input class="w3-radio" type="radio" name="scale" value="v" v-model="scale" :checked="scale != 'fb_bloc'" @change="scaleChanged">
-                <label>V</label>
+                <label for="toggle-v" class="toggle-label">V</label>
+
+                <div class="toggle-slider"></div>
             </div>
             <table class="w3-table-all" v-cloak>
                 <thead>
@@ -124,13 +163,18 @@
                     <td>{{ loggedRoute.grade }}</td>
                     <td>{{ loggedRoute.climbed == true? 'Ja' : 'Nein' }}</td>
                     <td>
-                        <img alt="edit climb" src="./img/edit_icon.svg" v-on:click="editRoute(loggedRoute.id)" />
-                        <img alt="delete climb" src="./img/delete_icon.svg" v-on:click="deleteRoute(loggedRoute.id)" />
+                        <button v-on:click="editRoute(loggedRoute.id)" class="action-btn"><img alt="edit climb"
+                                src="./img/edit_icon.svg" /></button>
+                        <button v-on:click="deleteRoute(loggedRoute.id)" class="action-btn"><img alt="delete climb"
+                                src="./img/delete_icon.svg" /></button>
                     </td>
                 </tr>
             </table>
         </article>
     </main>
+    <footer class="w3-container w3-indigo footer">
+        <p>&#169; Ivo von Rickenbach - WEBT HS 23 Projekt</p>
+    </footer>
     <script src="https://cdn.jsdelivr.net/npm/vue@3.2.31"></script>
     <script src="./script/script.js"></script>
 </body>
