@@ -20,7 +20,8 @@ Vue.createApp({
             const ctx = canvas.getContext('2d');
             const cellWidth = canvas.width / this.cols;
             const cellHeight = canvas.height / this.rows;
-            const holdTypes = [['circle', 'triangle', 'double-line', 'circle'], ['rectangle', 'line', 'rectangle', 'circle'],
+            const holdTypes = [['circle', 'triangle', 'double-line', 'circle'], 
+            ['rectangle', 'line', 'rectangle', 'circle'],
             ['line', 'triangle', 'line', 'double-line'],
             ['triangle', 'rectangle', 'rectangle', 'circle'],
             ['circle', 'line', 'line', 'circle'],
@@ -80,6 +81,7 @@ Vue.createApp({
             this.markedHolds = Array.from({ length: this.rows }, () =>
                 Array.from({ length: this.cols }, () => false)
             );
+
             for (let row = 0; row < this.rows; row++) {
                 const twoHolds = Math.floor(Math.random() * 11) > 7;
                 this.markedHolds[row][Math.floor(Math.random() * this.cols)] = true;
@@ -101,14 +103,14 @@ Vue.createApp({
             if (Object.keys(this.errorMsg).length === 0) {
                 const climb = {
                     id: this.id,
-                    name: "a",
+                    name: this.routeName,
                     grade: this.routeGrade,
                     climbed: this.climbed || false,
                     route: this.markedHolds
                 }
 
-                this.sendRequest(this.id != 0 ? 'PATCH' : 'POST', 'climb' + (this.id != 0 ? `?id=${this.id}` : ''), () => {
-                    this.getRoutes();
+                this.sendRequest(this.id != 0 ? 'PATCH' : 'POST', 'climb' + (this.id != 0 ? `?id=${this.id}` : ''), (response) => {
+                    this.loggedRoutes = JSON.parse(response);
                 }, JSON.stringify(climb));
                 this.fillClimb(null);
             }
@@ -166,7 +168,6 @@ Vue.createApp({
             }
         },
         validateGrade() {
-            // todo fix
             if (this.routeGrade.length < 1) {
                 this.errorMsg['grade'] = "Wählen sie einen gültigen schwierigkeitsgrad aus der Liste aus.";
             } else {

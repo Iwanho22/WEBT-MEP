@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 
 <head>
     <title>The Crux</title>
@@ -7,7 +7,7 @@
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta lang="de">
+
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 </head>
@@ -15,8 +15,9 @@
 <body>
     <header class="w3-bar w3-indigo nav-bar">
         <nav class="nav">
-            <a href="#information" class="w3-bar-item w3-button"><img class="header-icon" src="./img/icon.png"
-                    alt="icon"></a>
+            <a href="#information" class="w3-bar-item w3-button">
+                <img class="header-icon" src="./img/icon.png" alt="icon">
+            </a>
             <a href="#information" class="w3-bar-item w3-button w3-large">Information</a>
             <a href="#input-area" class="w3-bar-item w3-button w3-large">Eingabe</a>
             <a href="#output-area" class="w3-bar-item w3-button w3-large">Routen</a>
@@ -26,8 +27,9 @@
     <main id="content" class="w3-row w3-row-padding" v-cloak>
         <div class="error-msg  w3-pale-red w3-leftbar w3-border-red" v-if="generalErrorMsg" v-cloak>
             <p>{{generalErrorMsg}}</p>
-            <button class="action-btn" v-on:click="generalErrorMsg = ''"><img class="error-msg-icon"
-                    src="./img/close_icon.svg"></button>
+            <button class="action-btn" v-on:click="generalErrorMsg = ''">
+                <img class="error-msg-icon" src="./img/close_icon.svg" alt="Kreuz">
+            </button>
         </div>
         <article id="information" class="w3-col l6">
             <h3>The Crux</h3>
@@ -38,7 +40,6 @@
                 und Dreiecke für Pockets. Die ausgewählten Griffe werden bei der Erstellung visuell hervorgehoben, um
                 die Route klar erkennbar zu machen.
             </p>
-
             <p>
                 Nach der Generierung kann der Benutzer der Route einen Namen geben, den Schwierigkeitsgrad aus einem
                 Dropdown-Menü auswählen und angeben, ob er die Route bereits geklettert hat. Diese Informationen werden
@@ -55,21 +56,26 @@
                 erlaubt es Kletterern aus unterschiedlichen Regionen, ihre Routen entsprechend vertrauten Standards zu
                 bewerten.
             </p>
-            <div class="hold-type-legend-container w3-col l3">
+            <div class="hold-type-legend-container w3-col s3">
                 <div class="hold-type-legend">
-                    <img src="./img/Jug.png"><span class="hold-type-desc">Jug</span>
+                    <img class="hold-type-img" src="./img/Jug.png" alt="Rechtecke">
+                    <span class="hold-type-desc">Jug</span>
                 </div>
                 <div class="hold-type-legend">
-                    <img class="hold-type-img" src="./img/crimp.png"><span class="hold-type-desc">Crimp</span>
+                    <img class="hold-type-img" src="./img/crimp.png" alt="Linie">
+                    <span class="hold-type-desc">Crimp</span>
                 </div>
                 <div class="hold-type-legend">
-                    <img class="hold-type-img" src="./img/pinch.png"><span class="hold-type-desc">Pinch</span>
+                    <img class="hold-type-img" src="./img/pinch.png" alt="Doppellinie">
+                    <span class="hold-type-desc">Pinch</span>
                 </div>
                 <div class="hold-type-legend">
-                    <img class="hold-type-img" src="./img/pocket.png"><span class="hold-type-desc">Pocket</span>
+                    <img class="hold-type-img" src="./img/pocket.png" alt="Dreieck">
+                    <span class="hold-type-desc">Pocket</span>
                 </div>
                 <div class="hold-type-legend">
-                    <img class="hold-type-img" src="./img/sloper.png"><span class="hold-type-desc">Sloper</span>
+                    <img class="hold-type-img" src="./img/sloper.png" alt="Kreis">
+                    <span class="hold-type-desc">Sloper</span>
                 </div>
             </div>
         </article>
@@ -85,21 +91,20 @@
                 <section class="w3-col m6">
                     <h4>Route erfassen</h4>
                     <form class="w3-container" id="route-registration-form" @submit.prevent="logRoute" novalidate>
-                        <p>
+                        <div class="form-row">
                             <label for="id-name">Name der Route</label>
                             <input id="id-name" class="w3-input" name="routeName" type="text" v-model="routeName"
                                 required @input="validateRouteName()">
-                        <p v-if="errorMsg['routeName']" class="w3-panel w3-pale-red w3-border w3-border-red">
-                            {{errorMsg['routeName']}}
-                        </p>
-                        </p>
-
-                        <p>
+                            <p v-if="errorMsg['routeName']" class="w3-panel w3-pale-red w3-border w3-border-red">
+                                {{errorMsg['routeName']}}
+                            </p>
+                        </div>
+                        <div class="form-row">
                             <input id="id-climbed" class="w3-check" name="climbed" type="checkbox" v-model="climbed"
                                 :checked="climbed">
                             <label for="id-climbed">Geklettert</label>
-                        </p>
-                        <p>
+                        </div>
+                        <div class="form-row">
                             <select id="id-grade" class="w3-select" name="grade" v-model="routeGrade" required
                                 @change="validateGrade()">
                                 <option value="" disabled selected>Schwierigkeitsgrad</option>
@@ -126,25 +131,27 @@
                                 <option value="8c+">{{scale == 'fb_bloc' ? '8c+' : 'V16'}}</option>
                                 <option value="9a">{{scale == 'fb_bloc' ? '9a' : 'V17'}}</option>
                             </select>
-                        <p v-if="errorMsg['grade']" class="w3-panel w3-pale-red w3-border w3-border-red">
-                            {{errorMsg['grade']}}
-                        </p>
-                        </p>
-                        <button :disabled='markedHolds.length == 0' class="w3-button w3-indigo">Speichern</button>
+                            <p v-if="errorMsg['grade']" class="w3-panel w3-pale-red w3-border w3-border-red">
+                                {{errorMsg['grade']}}
+                            </p>
+                        </div>
+                        <div class="form-row form-buttons">
+                            <button :disabled='markedHolds.length == 0' class="w3-button w3-indigo">Speichern</button>
+                            <button :disabled='markedHolds.length == 0' class="w3-button w3-indigo" v-on:click="fillClimb(null)">Abbrechen</button>
+                        </div>
                     </form>
                 </section>
             </div>
         </article>
         <article id="output-area" class="w3-col">
+            <h3>Routen</h3>
             <div class="toggle-container">
                 <input type="radio" id="toggle-fb_bloc" name="scale" value="fb_bloc" :checked="scale == 'fb_bloc'"
                     v-model="scale" @change="scaleChanged">
                 <label for="toggle-fb_bloc" class="toggle-label">FB bloc</label>
-
                 <input type="radio" id="toggle-v" name="scale" value="v" v-model="scale" :checked="scale != 'fb_bloc'"
                     @change="scaleChanged">
                 <label for="toggle-v" class="toggle-label">V</label>
-
                 <div class="toggle-slider"></div>
             </div>
             <table class="w3-table-all" v-cloak>
@@ -163,10 +170,12 @@
                     <td>{{ loggedRoute.grade }}</td>
                     <td>{{ loggedRoute.climbed == true? 'Ja' : 'Nein' }}</td>
                     <td>
-                        <button v-on:click="editRoute(loggedRoute.id)" class="action-btn"><img alt="edit climb"
-                                src="./img/edit_icon.svg" /></button>
-                        <button v-on:click="deleteRoute(loggedRoute.id)" class="action-btn"><img alt="delete climb"
-                                src="./img/delete_icon.svg" /></button>
+                        <button v-on:click="editRoute(loggedRoute.id)" class="action-btn">
+                            <img alt="edit climb" src="./img/edit_icon.svg" />
+                        </button>
+                        <button v-on:click="deleteRoute(loggedRoute.id)" class="action-btn">
+                            <img alt="delete climb" src="./img/delete_icon.svg" />
+                        </button>
                     </td>
                 </tr>
             </table>
@@ -176,7 +185,7 @@
         <p>&#169; Ivo von Rickenbach - WEBT HS 23 Projekt</p>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/vue@3.2.31"></script>
-    <script src="./script/script.js"></script>
+    <script src="./js/script.js"></script>
 </body>
 
 </html>

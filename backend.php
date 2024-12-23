@@ -1,11 +1,12 @@
 <?php
 $conn = mysqli_connect("localhost", "root", "", "thecrux");
+
 header('Content-Type: application/json');
+
 const FB_BLOC = 'fb_bloc';
 const V = 'v';
 const ROUTE_ROWS = 6;
 const ROUTE_COLS = 4;
-$selectedScale;
 
 if(!isset($_COOKIE['scale'])) {
     setcookie('scale', FB_BLOC);
@@ -41,7 +42,6 @@ if ($conn->connect_error) {
     return_error(500, "Error while connection to Database");
 }
 
-
 if (isset($_GET['method']) && $_GET['method'] == 'climb') {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $climb = decode_json(file_get_contents("php://input"));
@@ -55,7 +55,7 @@ if (isset($_GET['method']) && $_GET['method'] == 'climb') {
         if (!$stmt->execute()) {
             return_error(500, "Error while saving climb.");
         }
-
+        echo(json_encode(get_all_routes($conn)));
     } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if (isset($_GET['id'])) {
             $stmt = $conn->prepare("SELECT id, name, grade, climbed, route from climb where id=?");
@@ -68,20 +68,9 @@ if (isset($_GET['method']) && $_GET['method'] == 'climb') {
                 echo(json_encode($result));
             } else {
                 return_error(500, "Error while loading climb with id=" . $_GET['id']);
-            };
-        } else {
-            $result = $conn->query("SELECT id, name, grade, climbed from climb");
-            if (is_bool($result) && !$result) {
-                return_error(500, "Error while loading climbs.");
-            } else {
-                $rows = [];
-                while ($row = $result->fetch_object()) {
-                    convert_grade($row);
-                    $rows[] = $row;
-                }
-
-                echo(json_encode($rows));
             }
+        } else {
+            echo(json_encode(get_all_routes($conn)));
         }
     } else if($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         if (isset($_GET['id'])) {
@@ -102,7 +91,11 @@ if (isset($_GET['method']) && $_GET['method'] == 'climb') {
                 return_error(500, "Error while updating climg with id=" . $id);
             }
         }
+    } else {
+        return_error(405, "Method not allowed");
     }
+} else {
+    return_error(404, "Not found");
 }
 
 $conn->close();
@@ -115,7 +108,7 @@ function convert_grade($climb) {
 }
 
 function convert_climb_to_dbmodel($climb) {
-    $climb->climbed = $climb->climbed === true; // TODO fix this
+    $climb->climbed = $climb->climbed === true;
     $climb->route = json_encode($climb->route);
 
     return $climb;
@@ -156,5 +149,20 @@ function decode_json($json) {
     }
 
     return $decoded;
+}
+
+function get_all_routes($conn) {
+    $result = $conn->query("SELECT id, name, grade, climbed from climb");
+    if (is_bool($result) && !$result) {
+        return_error(500, "Error while loading climbs.");
+    } else {
+        $rows = [];
+        while ($row = $result->fetch_object()) {
+            convert_grade($row);
+            $rows[] = $row;
+        }
+
+        return $rows;
+    }
 }
 ?>
