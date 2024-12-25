@@ -115,8 +115,8 @@ function convert_climb_to_dbmodel($climb) {
 }
 
 function validate_climb($climb) {
-    if (is_string($climb->name) && strlen($climb->name) < 5) {
-        return_error(400, "Invalid name, name must be at least 5 characters.");
+    if (is_string($climb->name) && (strlen($climb->name) < 5 || strlen($climb->name) > 40)) {
+        return_error(400, "Invalid name, name must be at least 5 and at max 40 characters.");
     } else if (is_string($climb->grade) && !array_key_exists($climb->grade, FB_TO_V)) {
         return_error(400, "Invalid route grade");
     }

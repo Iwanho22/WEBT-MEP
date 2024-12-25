@@ -124,3 +124,7 @@ nav {
     display: flex;
     justify-content: space-between;
 }
+
+.margin-top {
+    margin-top: 15px;
+}

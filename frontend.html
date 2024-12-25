@@ -105,7 +105,8 @@
                             <label for="id-climbed">Geklettert</label>
                         </div>
                         <div class="form-row">
-                            <select id="id-grade" class="w3-select" name="grade" v-model="routeGrade" required
+                            <label for="id-grade">Schwierigkeitsgrad</label>
+                            <select id="id-grade" class="w3-select margin-top" name="grade" v-model="routeGrade" required
                                 @change="validateGrade()">
                                 <option value="" disabled selected>Schwierigkeitsgrad</option>
                                 <option value="4">{{scale == 'fb_bloc' ? 4 : 'V0'}}</option>

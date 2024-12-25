@@ -146,10 +146,10 @@ Vue.createApp({
             xhr.open(method, url, true);
             xhr.send(body);
             xhr.onerror = () => {
-                this.generalErrorMsg = "Es ist ein allgeimeiner Fehler aufgetreten bitte versuchen sie es erneut.";
+                this.generalErrorMsg = "Es ist ein allgemeiner Fehler aufgetreten, bitte versuchen sie es erneut.";
             }
             xhr.ontimeout = () => {
-                this.generalErrorMsg = "Es ist ein allgeimeiner Fehler aufgetreten bitte versuchen sie es erneut.";
+                this.generalErrorMsg = "Es ist ein allgemeiner Fehler aufgetreten, bitte versuchen sie es erneut.";
             }
         },
         fillClimb(climb) {
@@ -161,8 +161,8 @@ Vue.createApp({
             this.drawCruxBoard();
         },
         validateRouteName() {
-            if (this.routeName.length < 5) {
-                this.errorMsg['routeName'] = "Der Routenname muss mindestens 5 Zeichen lang sein.";
+            if (this.routeName.length < 5 || this.routeName.length >40) {
+                this.errorMsg['routeName'] = "Der Routenname muss mindestens 5 und maximal 40 Zeichen lang sein.";
             } else {
                 delete this.errorMsg['routeName'];
             }
