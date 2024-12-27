@@ -100,6 +100,7 @@ Vue.createApp({
             e.preventDefault();
             this.validateGrade();
             this.validateRouteName();
+            let existingRoute = this.id != 0;
             if (Object.keys(this.errorMsg).length === 0) {
                 const climb = {
                     id: this.id,
@@ -109,8 +110,12 @@ Vue.createApp({
                     route: this.markedHolds
                 }
 
-                this.sendRequest(this.id != 0 ? 'PATCH' : 'POST', 'climb' + (this.id != 0 ? `?id=${this.id}` : ''), (response) => {
-                    this.loggedRoutes = JSON.parse(response);
+                this.sendRequest(existingRoute ? 'PATCH' : 'POST', 'climb' + (this.id != 0 ? `?id=${this.id}` : ''), (response) => {
+                    if (existingRoute) {
+                        this.getRoutes();
+                    } else {
+                        this.loggedRoutes = JSON.parse(response);
+                    }
                 }, JSON.stringify(climb));
                 this.fillClimb(null);
             }
@@ -155,7 +160,7 @@ Vue.createApp({
         fillClimb(climb) {
             this.routeName = climb?.name || '';
             this.routeGrade = climb?.grade || '';
-            this.climbed = climb?.climbed || false;
+            this.climbed = climb?.climbed == 1 || false;
             this.markedHolds = climb?.route || [];
             this.id = climb?.id || 0;
             this.drawCruxBoard();
